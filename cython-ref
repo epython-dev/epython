@@ -1,0 +1,42 @@
+* cimport <name>
+* from <name> cimport <var>
+* cdef extern from <name>
+     <type> name (type)
+     <type> name (type, type)
+     
+In EPython these should all be just import statements (no cimport or cdef) required. 
+EPython files will have the .epy spelling to ensure they are compiled first to the run-time
+requirement.
+    
+* absolute import to access variables in Python name-space
+
+There will be a python module available so that import python returns a namespace that has 
+variables available in sys, etc.
+
+* cdef <name> <typename>
+
+EPython: this uses standard type annotation
+
+ <name> : <typename>
+
+* @cython.internal
+* @cython.final
+
+EPython: change "cython" to "epython"
+
+@epython.internal and @epython.final
+
+* cdef class <name>
+
+This is just standard class <name>  
+
+* cdef public 
+
+* cpdef name (types, ...)
+
+EPython: By default classes, functions, and types are public and have both run-time specific and Python implementations.
+Use @epython.internal to make certain functions not have external visibility.
+
+* cpdef <ret_type> <name> (<type> <name>, ... ) except? <value>:
+
+EPython: Exception handling will be run-time specific and this is not supported yet.
