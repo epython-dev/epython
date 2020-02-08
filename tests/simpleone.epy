@@ -1,0 +1,7 @@
+
+
+def func(a : int) -> float:
+    b : int = 3
+    return a * b* 1.0
+
+
