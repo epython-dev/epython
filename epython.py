@@ -2,6 +2,10 @@
 EPython is a code-transformer that translates a statically typed subset of
 Python syntax into an extension of Python for a particular backend.
 
+The .epy file is first compiled into an AST
+The AST is validated to ensure it uses only the allowed subset of Python
+The AST is then fed to a transformer specific to the backend.
+
 """
 import argparse
 import ast
