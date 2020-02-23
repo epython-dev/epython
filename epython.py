@@ -10,6 +10,26 @@ The AST is then fed to a transformer specific to the backend.
 import argparse
 import ast
 
+# See https://greentreesnakes.readthedocs.io/en/latest/nodes.html
+
+disallowed_nodes = [ast.AsyncFor, ast.AsyncFunctionDef, 
+            ast.AsyncWith, ast.Delete, ast.Raise, ast.Try,
+            ast.GeneratorExp, ast.Await, ast.Yield, ast.YieldFrom, 
+            ast.Del, ast.ExceptHandler, ast.Starred, ast.ListComp,
+            ast.SetComp, ast.DictComp, ast.comprehension,
+            ast.Try, #ast.TryFinally, ast.TryExcept, 
+            ast.With, ast.withitem, ast.Interactive]
+
+def validate(code):
+    for node in ast.walk(code):
+        if node.__class__ in disallowed_nodes:
+            err = ValueError
+            info = f"Invalid node {node.__class__}"
+            if hasattr(node, "lineno"):
+                info += f" at line {node.lineno}"
+            return err, info
+    return None
+
 def main():
     parser = argparse.ArgumentParser(prog='epython', 
             description="Compile statically typed subset of Python to a backend.")
@@ -22,9 +42,14 @@ def main():
     with open(args.file) as myfile:
         source = myfile.read()
 
-    res = compile(source, args.file, 'exec', flags=ast.PyCF_ONLY_AST)
+    code = compile(source, args.file, 'exec', flags=ast.PyCF_ONLY_AST)
 
-    print(ast.dump(res))
+    result = validate(code)
+
+    if result is not None:
+        raise result[0](result[1])
+
+    return code
 
 if __name__ == "__main__":
-    main()
+    code = main()
