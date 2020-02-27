@@ -64,8 +64,6 @@ def validate(code):
     return None
 
 def main():
-
-    # 
     parser = argparse.ArgumentParser(prog='epython', 
             description="Compile statically typed subset of Python to a backend.")
     parser.add_argument("file")
