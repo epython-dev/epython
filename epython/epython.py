@@ -12,6 +12,8 @@ import ast
 
 # See https://greentreesnakes.readthedocs.io/en/latest/nodes.html
 
+_registry = {}
+
 disallowed_nodes = [ast.AsyncFor, ast.AsyncFunctionDef, 
             ast.AsyncWith, ast.Delete, ast.Raise, ast.Try,
             ast.GeneratorExp, ast.Await, ast.Yield, ast.YieldFrom, 
@@ -19,6 +21,31 @@ disallowed_nodes = [ast.AsyncFor, ast.AsyncFunctionDef,
             ast.SetComp, ast.DictComp, ast.comprehension,
             ast.Try, #ast.TryFinally, ast.TryExcept, 
             ast.With, ast.withitem, ast.Interactive]
+
+def register_func(name_or_func):
+    if isinstance(name_or_func, str):
+        name = name_or_func
+        func = None
+    else:
+        func = name_or_func
+        name = func.__name__
+    if func is None:
+        def decorator(new_func):
+            _registry[name] = new_func
+            return new_func
+        return decorator
+    else:
+        _registry[name] = func
+        return func
+
+
+@register_func('cpython')
+def transform(ast):
+    return ast
+
+@register_func
+def pypy(mine):
+    return mine
 
 def validate(code):
     for node in ast.walk(code):
@@ -51,5 +78,5 @@ def main():
 
     return code
 
-if __name__ == "__main__":
-    code = main()
+#if __name__ == "__main__":
+#    code = main()
