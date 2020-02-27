@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    version='0.0.1',
+    version='0.0.2',
     name='epython',
     url='https://github.com/epython-dev/epython',
     description='A typed subset of Python to be used as an extension language',

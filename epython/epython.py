@@ -9,6 +9,7 @@ The AST is then fed to a transformer specific to the backend.
 """
 import argparse
 import ast
+import os.path
 
 # See https://greentreesnakes.readthedocs.io/en/latest/nodes.html
 
@@ -38,14 +39,19 @@ def register_func(name_or_func):
         _registry[name] = func
         return func
 
+# A transformation function needs to take as agruments
+#  ast: the validated ast of the code 
+#  filename: the name to generate the artefacts
+#
+# It returns the PATH (or URL) of the created artefact
 
 @register_func('cpython')
-def transform(ast):
-    return ast
+def transform(ast, name):
+    return name + '.so'
 
-@register_func
-def pypy(mine):
-    return mine
+# @register_func
+# def pypy(mine):
+#     return mine       
 
 def validate(code):
     for node in ast.walk(code):
@@ -58,25 +64,50 @@ def validate(code):
     return None
 
 def main():
+
+    # 
     parser = argparse.ArgumentParser(prog='epython', 
             description="Compile statically typed subset of Python to a backend.")
-
     parser.add_argument("file")
     parser.add_argument("--backend", default="cpython")
-
+    parser.add_argument("--name", default="none")
     args = parser.parse_args()
+
+    if args.name == 'none':
+        name = os.path.splitext(args.file)[0]
+    else:
+        name = args.name
 
     with open(args.file) as myfile:
         source = myfile.read()
-
-    code = compile(source, args.file, 'exec', flags=ast.PyCF_ONLY_AST)
-
+ 
+    code = compile(source, name, 'exec', flags=ast.PyCF_ONLY_AST)
     result = validate(code)
-
     if result is not None:
         raise result[0](result[1])
 
+    try:
+        transformer = _registry[args.backend]
+    except KeyError:
+        raise RuntimeError(f"There is no epython backend registered for {args.backend}.")
+
+    ouput = transformer(code, name)
+
     return code
 
-#if __name__ == "__main__":
-#    code = main()
+# importing the backend should be sufficient to call the decorator 
+# that registers the function.
+def find_backends():
+    import importlib
+    import pkgutil
+
+    discovered_plugins = {
+        name: importlib.import_module(name)
+        for finder, name, ispkg in pkgutil.iter_modules()
+                if name.startswith('epython-')
+    }
+
+    
+if __name__ == "__main__":
+    find_backends()
+    code = main()
