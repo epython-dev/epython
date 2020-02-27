@@ -16,7 +16,7 @@ If you are interested in contributing to the design and goals, then join the Dis
 
     epython extmodule.epy --runtime=cpython  
     
-Produces a is a compiled extension module for then given Python runtime.
+Produces a compiled extension module for then given Python runtime.
 
 
 
