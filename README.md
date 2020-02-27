@@ -10,11 +10,14 @@ If you are interested in contributing to the design and goals, then join the Dis
 
 # Installation
 
-'pip install epython'
+    pip install epython
 
 # Usage
 
-'epython extmodule.epy --runtime=cpython'  -- result is a compiled extension module for then given Python runtime
+    epython extmodule.epy --runtime=cpython  
+    
+Produces a is a compiled extension module for then given Python runtime.
+
 
 
 
