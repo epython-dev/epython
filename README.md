@@ -5,7 +5,10 @@ The goal is to be able to write things like NumPy, SciPy, Pandas, bitarray, and 
 
 This project is in development and extremely alpha.   You should not use this for anything.
 
-If you are interested in contributing to the design and goals, then join the Discussion at OpenTeams Slack
+Learn more on this talk [Travis Oliphant gave at PyData Austin 2019](https://www.youtube.com/watch?v=Z8vsTxzmorE).
+
+
+If you are interested in contributing to the design and goals, then join the Discussion at [OpenTeams Slack](https://openteams.com/projects/epython)
 
 
 # Installation
