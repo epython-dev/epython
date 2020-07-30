@@ -64,6 +64,9 @@ def validate(code):
     return None
 
 def main():
+    import astor
+
+    find_backends()
     parser = argparse.ArgumentParser(prog='epython', 
             description="Compile statically typed subset of Python to a backend.")
     parser.add_argument("file")
@@ -89,23 +92,32 @@ def main():
     except KeyError:
         raise RuntimeError(f"There is no epython backend registered for {args.backend}.")
 
-    ouput = transformer(code, name)
+    output = transformer(code, name)
 
+    print(astor.to_source(code))
     return code
 
-# importing the backend should be sufficient to call the decorator 
-# that registers the function.
+# importing the backend should be sufficient to call the decorator(s) 
+# that registers the function in _registry which is why the 
+# dictionary created here is not returned or seemingly unused.
 def find_backends():
     import importlib
     import pkgutil
 
+    # importing the module registers the function.
     discovered_plugins = {
         name: importlib.import_module(name)
         for finder, name, ispkg in pkgutil.iter_modules()
                 if name.startswith('epython-')
     }
 
+    if len(discovered_plugins) > len(_registry):
+        print("Registry: ")
+        print(_registry)
+        print("\n\nPlugin Modules Found: ")
+        print(discovered_plugins)
+        raise ValueError, "The number of Plugin Modules Found is larger " + \
+                          "than the number of transformations successfully registered."
     
 if __name__ == "__main__":
-    find_backends()
     code = main()

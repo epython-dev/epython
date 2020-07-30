@@ -1,0 +1,36 @@
+# Assume Tensors and DataFrames are builtin to the system (i.e. they produce code)
+# based on backend selections). 
+
+# A Tensor is a container of a Type. Zero-dimensional tensors exist
+#  and are analogous to elements of the Type.
+#  You must index the 0-d array to produce the element.
+
+# Elements of the Tensor must be explictly extracted using the syntax a[()]
+# where a evaluates to a 0-d Tensor.  This always copies the element into a new 
+# object.
+
+# A Tensor has attributes: shape, ndim, dtype, T, kind
+
+# A Tensor kind is a meta-type which is one of the Types:
+# General > Gamma > Strided > C-contiguous > F-contiguous
+# General > Chunked 
+
+# Based on the kind of Tensor we have private fields that are present or not
+# GeneralMeta:
+    index_map : a function of ndim arguments and a state Object that produces
+                a 0-d tensor. 
+# General:
+    index_map : (a function of ndim integer arguments that produces a 0-d tensor)
+# Gamma adds:
+    gamma_map : (a function of ndim integer arguments that produces an integer)
+    datapointer : a 1-d array of bytes
+# Strided adds:
+    strides : a Tuple of integers indicating the number of bytes to jump to get
+# C-Contiguous:
+    no additional information, the other attributes functions are computed as needed.
+# F-Contiguous:
+    no additional information, the other attributes are computed as needed.
+    
+Also builtin to the system are "generalized universal functions"
+
+These operate on 
