@@ -116,8 +116,8 @@ def find_backends():
         print(_registry)
         print("\n\nPlugin Modules Found: ")
         print(discovered_plugins)
-        raise ValueError, "The number of Plugin Modules Found is larger " + \
-                          "than the number of transformations successfully registered."
+        raise (ValueError, "The number of Plugin Modules Found is larger " + \
+                "than the number of transformations successfully registered.")
     
 if __name__ == "__main__":
     code = main()
