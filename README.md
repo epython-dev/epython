@@ -17,9 +17,9 @@ If you are interested in contributing to the design and goals, then join the Dis
 
 # Usage
 
-    epython extmodule.epy --runtime=cpython  
+    epython extmodule.epy --backend=cpython  
     
-Produces a compiled extension module for the given Python runtime.
+Produces a compiled extension module for the given Python backend.
 
 
 
