@@ -11,6 +11,8 @@ import argparse
 import ast
 import os.path
 
+from epython import __version__
+
 # See https://greentreesnakes.readthedocs.io/en/latest/nodes.html
 
 _registry = {}
@@ -70,6 +72,8 @@ def main():
     parser.add_argument("file")
     parser.add_argument("--backend", default="cpython")
     parser.add_argument("--name", default="none")
+    parser.add_argument("--version", action='version',
+                        version='%(prog)s ' + __version__)
     args = parser.parse_args()
 
     if args.name == 'none':
@@ -77,8 +81,8 @@ def main():
     else:
         name = args.name
 
-    with open(args.file) as myfile:
-        source = myfile.read()
+    with open(args.file) as fi:
+        source = fi.read()
 
     code = ast.parse(source, name, 'exec', type_comments=True)
     result = validate(code)
@@ -116,8 +120,9 @@ def find_backends():
         print(_registry)
         print("\n\nPlugin Modules Found: ")
         print(discovered_plugins)
-        raise (ValueError, "The number of Plugin Modules Found is larger " + \
-                "than the number of transformations successfully registered.")
+        raise (ValueError, "The number of Plugin Modules Found is larger "
+               "than the number of transformations successfully registered.")
+
 
 if __name__ == "__main__":
     code = main()
