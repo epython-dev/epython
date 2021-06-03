@@ -5,19 +5,31 @@ from .unparse import Unparser
 # and generate Cython code instead for nodes that have type information
 class CythonGenerator(Unparser):
 
-    def get_type_comment(self, node):
-         comment = self._type_ignores.get(node.lineno) or node.type_comment
-         if comment is not None:
-            return comment
+    def get_type_from_comment(self, node):
+        tp = self._type_ignores.get(node.lineno) or node.type_comment
+        if tp is not None:
+            return tp
 
     def visit_Assign(self, node):
          self.fill()
          for target in node.targets:
-             if type_comment := self.get_type_comment(node):
+             if type_comment := self.get_type_from_comment(node):
                  self.write(f"cdef {type_comment} ")
              self.traverse(target)
              self.write(" = ")
          self.traverse(node.value)
+
+    def visit_AnnAssign(self, node):
+        self.fill()
+        self.write("cdef ")
+        self.traverse(node.annotation)
+        self.write(" ")
+        with self.delimit_if("(", ")", not node.simple and
+                             isinstance(node.target, Name)):
+            self.traverse(node.target)
+        if node.value:
+            self.write(" = ")
+            self.traverse(node.value)
 
     def _function_helper(self, node, fill_suffix):
         self.maybe_newline()
@@ -33,7 +45,7 @@ class CythonGenerator(Unparser):
             self.fill(def_str)
         with self.delimit("(", ")"):
             self.traverse(node.args)
-        with self.block(extra=self.get_type_comment(node)):
+        with self.block(extra=self.get_type_from_comment(node)):
             self._write_docstring_and_traverse_body(node)
 
     def visit_arg(self, node):
