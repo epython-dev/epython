@@ -12,18 +12,11 @@ import ast
 import os.path
 
 from epython import __version__
+from .validate import validate
 
 # See https://greentreesnakes.readthedocs.io/en/latest/nodes.html
 
 _registry = {}
-
-disallowed_nodes = [ast.AsyncFor, ast.AsyncFunctionDef,
-            ast.AsyncWith, ast.Delete, ast.Raise, ast.Try,
-            ast.GeneratorExp, ast.Await, ast.Yield, ast.YieldFrom,
-            ast.Del, ast.ExceptHandler, ast.Starred, ast.ListComp,
-            ast.SetComp, ast.DictComp, ast.comprehension,
-            ast.Try, #ast.TryFinally, ast.TryExcept,
-            ast.With, ast.withitem, ast.Interactive]
 
 def register_func(name_or_func):
     if isinstance(name_or_func, str):
@@ -54,16 +47,6 @@ def transform(ast, name):
 # @register_func
 # def pypy(mine):
 #     return mine
-
-def validate(code):
-    for node in ast.walk(code):
-        if node.__class__ in disallowed_nodes:
-            err = ValueError
-            info = f"Invalid node {node.__class__}"
-            if hasattr(node, "lineno"):
-                info += f" at line {node.lineno}"
-            return err, info
-    return None
 
 def main():
     find_backends()
