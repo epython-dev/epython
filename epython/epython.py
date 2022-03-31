@@ -11,17 +11,12 @@ import argparse
 import ast
 import os.path
 
+from epython import __version__
+from .validate import validate
+
 # See https://greentreesnakes.readthedocs.io/en/latest/nodes.html
 
 _registry = {}
-
-disallowed_nodes = [ast.AsyncFor, ast.AsyncFunctionDef, 
-            ast.AsyncWith, ast.Delete, ast.Raise, ast.Try,
-            ast.GeneratorExp, ast.Await, ast.Yield, ast.YieldFrom, 
-            ast.Del, ast.ExceptHandler, ast.Starred, ast.ListComp,
-            ast.SetComp, ast.DictComp, ast.comprehension,
-            ast.Try, #ast.TryFinally, ast.TryExcept, 
-            ast.With, ast.withitem, ast.Interactive]
 
 def register_func(name_or_func):
     if isinstance(name_or_func, str):
@@ -40,7 +35,7 @@ def register_func(name_or_func):
         return func
 
 # A transformation function needs to take as agruments
-#  ast: the validated ast of the code 
+#  ast: the validated ast of the code
 #  filename: the name to generate the artefacts
 #
 # It returns the PATH (or URL) of the created artefact
@@ -51,27 +46,17 @@ def transform(ast, name):
 
 # @register_func
 # def pypy(mine):
-#     return mine       
-
-def validate(code):
-    for node in ast.walk(code):
-        if node.__class__ in disallowed_nodes:
-            err = ValueError
-            info = f"Invalid node {node.__class__}"
-            if hasattr(node, "lineno"):
-                info += f" at line {node.lineno}"
-            return err, info
-    return None
+#     return mine
 
 def main():
-    import astor
-
     find_backends()
-    parser = argparse.ArgumentParser(prog='epython', 
+    parser = argparse.ArgumentParser(prog='epython',
             description="Compile statically typed subset of Python to a backend.")
     parser.add_argument("file")
     parser.add_argument("--backend", default="cpython")
     parser.add_argument("--name", default="none")
+    parser.add_argument("--version", action='version',
+                        version='%(prog)s ' + __version__)
     args = parser.parse_args()
 
     if args.name == 'none':
@@ -79,10 +64,10 @@ def main():
     else:
         name = args.name
 
-    with open(args.file) as myfile:
-        source = myfile.read()
- 
-    code = compile(source, name, 'exec', flags=ast.PyCF_ONLY_AST)
+    with open(args.file) as fi:
+        source = fi.read()
+
+    code = ast.parse(source, name, 'exec', type_comments=True)
     result = validate(code)
     if result is not None:
         raise result[0](result[1])
@@ -94,11 +79,13 @@ def main():
 
     output = transformer(code, name)
 
-    print(astor.to_source(code))
-    return code
+    from .cython_backend import CythonGenerator
+    translator = CythonGenerator()
+    print(translator.visit(code))
 
-# importing the backend should be sufficient to call the decorator(s) 
-# that registers the function in _registry which is why the 
+
+# importing the backend should be sufficient to call the decorator(s)
+# that registers the function in _registry which is why the
 # dictionary created here is not returned or seemingly unused.
 def find_backends():
     import importlib
@@ -116,8 +103,9 @@ def find_backends():
         print(_registry)
         print("\n\nPlugin Modules Found: ")
         print(discovered_plugins)
-        raise (ValueError, "The number of Plugin Modules Found is larger " + \
-                "than the number of transformations successfully registered.")
-    
+        raise (ValueError, "The number of Plugin Modules Found is larger "
+               "than the number of transformations successfully registered.")
+
+
 if __name__ == "__main__":
     code = main()
