@@ -1,0 +1,7 @@
+name: epython-dev
+channels:
+  - conda-forge
+dependencies:
+  - python==3.9
+  - pydantic
+  - pip
