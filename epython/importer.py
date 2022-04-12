@@ -1,5 +1,19 @@
 """
 Importing this module allows import .epy files like .py files.
+
+The main reason for naming epython files with the .epy file extension is to
+avoid confusion with regular Python modules.  A package may contain a number
+of (sub-) modules of which only some are epython extensions.
+
+For development of epython packages, it is nevertheless very useful to import
+.epy files just like .pt files, which is possible by simply importing epython
+first.  E.g.
+
+    import epython
+    import myext    # will import myext.epy
+
+Without importing epython first, myext will not work, which helps to avoid
+using epython extensions as pure Python modules (which will be quite slow).
 """
 import sys
 import imp
