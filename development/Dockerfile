@@ -1,4 +1,4 @@
-FROM pyodide/pyodide:0.19.1
+FROM pyodide/pyodide:0.20.0
 
 # Switch shell to bash
 SHELL ["/bin/bash", "-c"]
