@@ -26,6 +26,18 @@ epython extmodule.epy --backend=cpython
 
 Produces a compiled extension module for the given Python backend.
 
+## Docker Development
+----------------------
+
+Install Docker, then run:
+
+`docker build -t epython-wasm -f ./development/Dockerfile .`
+
+From the root of the repository. 
+
+To run the interactive session:
+
+`docker run -p 8008:8000 -t epython-wasm:latest `
 
 # Development
 
